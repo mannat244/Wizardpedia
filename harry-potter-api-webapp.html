@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wizardpedia</title>
+    <style>
+        :root {
+            --gryffindor-primary: #740001;
+            --gryffindor-secondary: #D3A625;
+            --slytherin-primary: #1A472A;
+            --slytherin-secondary: #5D5D5D;
+            --ravenclaw-primary: #0E1A40;
+            --ravenclaw-secondary: #946B2D;
+            --hufflepuff-primary: #ECB939;
+            --hufflepuff-secondary: #372E29;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-heading: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #f5f5f5;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cGF0aCBkPSJNMTIuNSAxNC43bC0uMSAyLjggNC45IDQuNiAyLjEtMi4xIDIuMSAyLjEgNC45LTQuNi0uMSAyLjhIMzVsLTIuMy0yLjcgOC43LTQuNi04LjQtNC45IDIuMy0yLjdIMjYuNGwuMSAyLjhMMjEuNiA0IDEzLjUgNC4xIDUuMyA1LjRsOC40IDQuOS0yLjMgMi43SDIwbC4xLTIuOEwxNSA1LjRsNC45IDQuOS0yLjEgMi4xLTIuMS0yLjEtNC45IDQuNi4xLTIuOEgwbDIuMyAyLjctOC43IDQuNiA4LjQgNC45TDAgMjZoMTAuNHYtLjMiIGZpbGw9InJnYmEoMjAwLDIwMCwyMDAsMC4xKSIvPjwvc3ZnPg==');
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--ravenclaw-primary);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .control-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .endpoints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .endpoint-btn {
+            background-color: var(--ravenclaw-primary);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .endpoint-btn:hover {
+            background-color: var(--ravenclaw-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .house-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .house-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .house-btn.gryffindor {
+            background-color: var(--gryffindor-primary);
+            color: white;
+        }
+
+        .house-btn.slytherin {
+            background-color: var(--slytherin-primary);
+            color: white;
+        }
+
+        .house-btn.ravenclaw {
+            background-color: var(--ravenclaw-primary);
+            color: white;
+        }
+
+        .house-btn.hufflepuff {
+            background-color: var(--hufflepuff-primary);
+            color: black;
+        }
+
+        .house-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .results-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--ravenclaw-primary);
+        }
+
+        .count-badge {
+            background-color: var(--ravenclaw-secondary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.2rem;
+            color: #666;
+            display: none;
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .spell-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .character-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .character-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            object-position: top;
+            background-color: #f0f0f0;
+        }
+
+        .character-image-placeholder {
+            height: 200px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            color: #999;
+            font-size: 3rem;
+        }
+
+        .character-body {
+            padding: 15px;
+        }
+
+        .character-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            font-family: var(--font-heading);
+        }
+
+        .character-house {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .house-badge.gryffindor {
+            background-color: var(--gryffindor-primary);
+            color: white;
+        }
+
+        .house-badge.slytherin {
+            background-color: var(--slytherin-primary);
+            color: white;
+        }
+
+        .house-badge.ravenclaw {
+            background-color: var(--ravenclaw-primary);
+            color: white;
+        }
+
+        .house-badge.hufflepuff {
+            background-color: var(--hufflepuff-primary);
+            color: black;
+        }
+
+        .house-badge.unknown {
+            background-color: #999;
+            color: white;
+        }
+
+        .character-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+
+        .info-label {
+            flex: 0 0 80px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .info-value {
+            flex: 1;
+        }
+
+        .spell-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-left: 5px solid var(--ravenclaw-primary);
+        }
+
+        .spell-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .spell-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            font-family: var(--font-heading);
+            color: var(--ravenclaw-primary);
+        }
+
+        .spell-description {
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .character-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .endpoints-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .house-filters {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .character-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .endpoints-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .house-btn {
+                flex: 1 0 calc(50% - 10px);
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+          /* Magic spell effects container */
+        .spell-effects-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        /* Spell particle */
+        .spell-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fade-out 1.5s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes fade-out {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        /* Spell blast */
+        .spell-blast {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 999;
+            animation: spell-blast 0.6s ease-out forwards;
+        }
+
+        @keyframes spell-blast {
+            0% {
+                opacity: 0.9;
+                width: 10px;
+                height: 10px;
+            }
+            100% {
+                opacity: 0;
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        /* Glow effect for buttons on hover */
+        .endpoint-btn:hover, .house-btn:hover {
+            box-shadow: 0 0 12px rgba(255, 235, 59, 0.7) !important;
+        }
+
+        /* Add other existing styles here... */
+
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translate(-50%, 0); }
+            to { opacity: 0; transform: translate(-50%, 20px); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Wizardpedia 🪄</h1>
+        <p class="subtitle">Discover the magical world of Harry Potter</p>
+    </header>
+
+    <div class="container">
+        <section class="control-panel">
+            <h2>API Endpoints</h2>
+            <div class="endpoints-grid">
+                <button class="endpoint-btn" data-endpoint="characters">All Characters</button>
+                <button class="endpoint-btn" data-endpoint="characters/students">Hogwarts Students</button>
+                <button class="endpoint-btn" data-endpoint="characters/staff">Hogwarts Staff</button>
+                <button class="endpoint-btn" data-endpoint="spells">All Spells</button>
+            </div>
+
+            <div id="house-filter-section" style="display: none;">
+                <h3 style="margin-top: 20px;">Filter by House</h3>
+                <div class="house-filters">
+                    <button class="house-btn gryffindor" data-house="gryffindor">Gryffindor</button>
+                    <button class="house-btn slytherin" data-house="slytherin">Slytherin</button>
+                    <button class="house-btn ravenclaw" data-house="ravenclaw">Ravenclaw</button>
+                    <button class="house-btn hufflepuff" data-house="hufflepuff">Hufflepuff</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="results-container">
+            <div class="results-header">
+                <h2 class="results-title">Welcome to the Harry Potter API Explorer</h2>
+                <span class="count-badge">0 items</span>
+            </div>
+
+            <div id="loading">
+                <p>Accio data... ⚡</p>
+            </div>
+
+            <div id="results">
+                <p>Select an API endpoint above to see the magical data!</p>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Powered by HP-API (https://hp-api.onrender.com) Made with 💖 by Mannat </p>
+    </footer>
+     <div class="spell-effects-container"></div>
+
+    <script>
+        // Create spell effects container
+        const spellEffectsContainer = document.querySelector('.spell-effects-container');
+
+        // Spell colors based on Hogwarts houses
+        const spellColors = [
+            { color: '#FFC107', shadow: '#FF9800' }, // Gold/Yellow (Hufflepuff)
+            { color: '#F44336', shadow: '#B71C1C' }, // Red (Gryffindor)
+            { color: '#4CAF50', shadow: '#1B5E20' }, // Green (Slytherin)
+            { color: '#2196F3', shadow: '#0D47A1' }, // Blue (Ravenclaw)
+            { color: '#9C27B0', shadow: '#4A148C' }  // Purple (Magic)
+        ];
+
+        // Spell names for visual effects
+        const spellNames = [
+            'Lumos', 
+            'Incendio', 
+            'Expelliarmus', 
+            'Stupefy', 
+            'Wingardium Leviosa',
+            'Alohomora',
+            'Expecto Patronum',
+            'Aguamenti'
+        ];
+
+        // Add click event listener to the document for spell casting
+        document.addEventListener('click', castSpell);
+
+        // Function to cast a spell effect at the click position
+        function castSpell(event) {
+            // Create a spell text that briefly appears
+            const spellNameElem = document.createElement('div');
+            const randomSpell = spellNames[Math.floor(Math.random() * spellNames.length)];
+            const spellColorSet = spellColors[Math.floor(Math.random() * spellColors.length)];
+            
+            spellNameElem.textContent = randomSpell;
+            spellNameElem.style.cssText = `
+                position: absolute;
+                left: ${event.clientX}px;
+                top: ${event.clientY - 20}px;
+                color: ${spellColorSet.color};
+                text-shadow: 0 0 5px ${spellColorSet.shadow};
+                font-family: var(--font-heading);
+                font-weight: bold;
+                font-size: 16px;
+                pointer-events: none;
+                z-index: 1001;
+                animation: float-up 1.2s forwards ease-out;
+                opacity: 0;
+                transform: translateY(0);
+            `;
+            
+            // Add keyframes for the floating text
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float-up {
+                    0% { opacity: 0; transform: translateY(0); }
+                    10% { opacity: 1; }
+                    100% { opacity: 0; transform: translateY(-40px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            spellEffectsContainer.appendChild(spellNameElem);
+            
+            // Create the main blast effect
+            const spellBlast = document.createElement('div');
+            spellBlast.className = 'spell-blast';
+            spellBlast.style.left = `${event.clientX}px`;
+            spellBlast.style.top = `${event.clientY}px`;
+            spellBlast.style.background = `radial-gradient(circle, ${spellColorSet.color}99 0%, ${spellColorSet.color}00 70%)`;
+            spellEffectsContainer.appendChild(spellBlast);
+            
+            // Create spell particles
+            const particleCount = 12 + Math.floor(Math.random() * 8);
+            
+            for (let i = 0; i < particleCount; i++) {
+                createSpellParticle(event.clientX, event.clientY, spellColorSet);
+            }
+            
+            // Clean up after animation completes
+            setTimeout(() => {
+                spellNameElem.remove();
+                spellBlast.remove();
+            }, 1500);
+        }
+
+        // Function to create a single spell particle
+        function createSpellParticle(x, y, colorSet) {
+            const particle = document.createElement('div');
+            particle.className = 'spell-particle';
+            
+            // Random size between 3 and 8px
+            const size = 3 + Math.random() * 5;
+            
+            // Random direction
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 1 + Math.random() * 3;
+            const distance = 30 + Math.random() * 80;
+            
+            // Calculate end position
+            const endX = x + Math.cos(angle) * distance;
+            const endY = y + Math.sin(angle) * distance;
+            
+            // Set initial position and style
+            particle.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background-color: ${colorSet.color};
+                box-shadow: 0 0 ${size * 2}px ${size / 2}px ${colorSet.shadow};
+            `;
+            
+            // Add to container
+            spellEffectsContainer.appendChild(particle);
+            
+            // Animate the particle
+            const duration = 0.5 + Math.random() * 1;
+            particle.animate([
+                { left: `${x}px`, top: `${y}px`, opacity: 1 },
+                { left: `${endX}px`, top: `${endY}px`, opacity: 0 }
+            ], {
+                duration: duration * 1000,
+                easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            });
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                particle.remove();
+            }, duration * 1000);
+        }
+
+        // Your existing script here...
+    </script>
+    <script>
+        // Base API URLs - We'll try the primary URL first, then fall back to the alternative
+        const PRIMARY_API_URL = 'https://hp-api.onrender.com/api/';
+        const FALLBACK_API_URL = 'https://hp-api.herokuapp.com/api/';
+        let API_BASE_URL = PRIMARY_API_URL;
+        
+        // DOM Elements
+        const endpointButtons = document.querySelectorAll('.endpoint-btn');
+        const houseButtons = document.querySelectorAll('.house-btn');
+        const houseFilterSection = document.getElementById('house-filter-section');
+        const resultsTitle = document.querySelector('.results-title');
+        const countBadge = document.querySelector('.count-badge');
+        const loadingElement = document.getElementById('loading');
+        const resultsElement = document.getElementById('results');
+        
+        // Track current state
+        let currentEndpoint = '';
+        let currentTitle = '';
+        
+        // Add event listeners to endpoint buttons
+        endpointButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const endpoint = button.dataset.endpoint;
+                currentEndpoint = endpoint;
+                
+                // Show/hide house filter section based on endpoint
+                if (endpoint === 'spells') {
+                    houseFilterSection.style.display = 'none';
+                    currentTitle = 'Magical Spells';
+                } else {
+                    houseFilterSection.style.display = 'block';
+                    
+                    if (endpoint === 'characters') {
+                        currentTitle = 'All Characters';
+                    } else if (endpoint === 'characters/students') {
+                        currentTitle = 'Hogwarts Students';
+                    } else if (endpoint === 'characters/staff') {
+                        currentTitle = 'Hogwarts Staff';
+                    }
+                }
+                
+                // Highlight active button
+                endpointButtons.forEach(btn => btn.style.opacity = '0.7');
+                button.style.opacity = '1';
+                
+                // Fetch and display data
+                await fetchData(endpoint);
+            });
+        });
+        
+        // Add event listeners to house buttons
+        houseButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const house = button.dataset.house;
+                await fetchData(`characters/house/${house}`);
+                currentTitle = `${house.charAt(0).toUpperCase() + house.slice(1)} House`;
+                updateUI();
+            });
+        });
+        
+        // Fetch data from API with fallback
+        async function fetchData(endpoint) {
+            // Show loading state
+            loadingElement.style.display = 'block';
+            resultsElement.innerHTML = '';
+            
+            try {
+                // Try fetching from primary URL
+                try {
+                    const response = await fetch(`${PRIMARY_API_URL}${endpoint}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Update UI with data
+                        renderData(data, endpoint);
+                        countBadge.textContent = `${data.length} items`;
+                        // Set the working URL as the default for future requests
+                        API_BASE_URL = PRIMARY_API_URL;
+                        return;
+                    }
+                } catch (primaryError) {
+                    console.log('Primary API failed, trying fallback...');
+                }
+                
+                // If primary fails, try fallback URL
+                const fallbackResponse = await fetch(`${FALLBACK_API_URL}${endpoint}`);
+                if (!fallbackResponse.ok) {
+                    throw new Error('Both API endpoints failed');
+                }
+                
+                const fallbackData = await fallbackResponse.json();
+                // Update UI with data
+                renderData(fallbackData, endpoint);
+                countBadge.textContent = `${fallbackData.length} items`;
+                // Set the working URL as the default for future requests
+                API_BASE_URL = FALLBACK_API_URL;
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                
+                // Display error with helpful information
+                resultsElement.innerHTML = `
+                    <div style="text-align: center; padding: 30px;">
+                        <p>Oops! Something went wrong.</p>
+                        <p>Error: ${error.message}</p>
+                        <div style="margin-top: 20px; padding: 15px; background-color: #f8f8f8; border-radius: 8px; text-align: left;">
+                            <h3>Troubleshooting:</h3>
+                            <ul style="padding-left: 20px; margin-top: 10px;">
+                                <li>This could be caused by CORS restrictions in your browser</li>
+                                <li>Try using a different browser</li>
+                                <li>Check your internet connection</li>
+                                <li>The API might be temporarily unavailable</li>
+                            </ul>
+                            
+                            <div style="margin-top: 20px;">
+                                <p><strong>Want to see how it works anyway?</strong></p>
+                                <button id="loadDemoData" style="background-color: var(--ravenclaw-primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                                    Load Demo Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                countBadge.textContent = '0 items';
+                
+                // Add event listener to the demo data button
+                setTimeout(() => {
+                    const demoButton = document.getElementById('loadDemoData');
+                    if (demoButton) {
+                        demoButton.addEventListener('click', () => loadDemoData(endpoint));
+                    }
+                }, 100);
+                
+            } finally {
+                loadingElement.style.display = 'none';
+                updateUI();
+            }
+        }
+        
+        // Render data based on endpoint
+        function renderData(data, endpoint) {
+            if (endpoint.includes('spell')) {
+                renderSpells(data);
+            } else {
+                renderCharacters(data);
+            }
+        }
+        
+        // Render characters
+        function renderCharacters(characters) {
+            if (characters.length === 0) {
+                resultsElement.innerHTML = '<p>No characters found.</p>';
+                return;
+            }
+            
+            const characterGrid = document.createElement('div');
+            characterGrid.className = 'character-grid';
+            
+            characters.forEach(character => {
+                const card = document.createElement('div');
+                card.className = 'character-card';
+                
+                // Get house class for styling
+                let houseClass = 'unknown';
+                if (character.house) {
+                    houseClass = character.house.toLowerCase();
+                }
+                
+                // Character image
+                let imageHtml = '';
+                if (character.image && character.image !== '') {
+                    imageHtml = `<img src="${character.image}" alt="${character.name}" class="character-image">`;
+                } else {
+                    const initial = character.name.charAt(0);
+                    imageHtml = `
+                        <div class="character-image-placeholder">
+                            ${initial}
+                        </div>
+                    `;
+                }
+                
+                // Character card HTML
+                card.innerHTML = `
+                    ${imageHtml}
+                    <div class="character-body">
+                        <h3 class="character-name">${character.name}</h3>
+                        ${character.house ? `<span class="character-house house-badge ${houseClass}">${character.house}</span>` : ''}
+                        
+                        <div class="character-info">
+                            <div class="info-row">
+                                <span class="info-label">Species:</span>
+                                <span class="info-value">${character.species || 'Unknown'}</span>
+                            </div>
+                            
+                            <div class="info-row">
+                                <span class="info-label">Gender:</span>
+                                <span class="info-value">${character.gender || 'Unknown'}</span>
+                            </div>
+                            
+                            ${character.dateOfBirth ? `
+                            <div class="info-row">
+                                <span class="info-label">Birthday:</span>
+                                <span class="info-value">${character.dateOfBirth}</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${character.ancestry ? `
+                            <div class="info-row">
+                                <span class="info-label">Ancestry:</span>
+                                <span class="info-value">${character.ancestry}</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${character.patronus ? `
+                            <div class="info-row">
+                                <span class="info-label">Patronus:</span>
+                                <span class="info-value">${character.patronus}</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${character.actor ? `
+                            <div class="info-row">
+                                <span class="info-label">Actor:</span>
+                                <span class="info-value">${character.actor}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                characterGrid.appendChild(card);
+            });
+            
+            resultsElement.innerHTML = '';
+            resultsElement.appendChild(characterGrid);
+        }
+        
+        // Render spells
+        function renderSpells(spells) {
+            if (spells.length === 0) {
+                resultsElement.innerHTML = '<p>No spells found.</p>';
+                return;
+            }
+            
+            const spellGrid = document.createElement('div');
+            spellGrid.className = 'spell-grid';
+            
+            spells.forEach(spell => {
+                const card = document.createElement('div');
+                card.className = 'spell-card';
+                
+                card.innerHTML = `
+                    <h3 class="spell-name">${spell.name}</h3>
+                    <p class="spell-description">${spell.description || 'No description available.'}</p>
+                `;
+                
+                spellGrid.appendChild(card);
+            });
+            
+            resultsElement.innerHTML = '';
+            resultsElement.appendChild(spellGrid);
+        }
+        
+        // Update UI elements
+        function updateUI() {
+            resultsTitle.textContent = currentTitle;
+        }
+        
+        // Load demo data when API calls fail
+        function loadDemoData(endpoint) {
+            const demoEndpoint = endpoint || 'characters';
+            
+            // Get the data for the requested endpoint
+            let data = DEMO_DATA[demoEndpoint];
+            
+            // If there's no exact match, try to find the closest match
+            if (!data) {
+                // Find the best match for house endpoints
+                if (demoEndpoint.includes('house/')) {
+                    const house = demoEndpoint.split('house/')[1];
+                    data = DEMO_DATA[`characters/house/${house}`] || [];
+                } else {
+                    // Default to all characters
+                    data = DEMO_DATA['characters'];
+                }
+            }
+            
+            // Render the demo data
+            renderData(data, demoEndpoint);
+            countBadge.textContent = `${data.length} items (Demo Data)`;
+            
+            // Update UI
+            if (demoEndpoint.includes('spell')) {
+                currentTitle = 'Magical Spells (Demo Data)';
+            } else if (demoEndpoint.includes('house/')) {
+                const house = demoEndpoint.split('house/')[1];
+                currentTitle = `${house.charAt(0).toUpperCase() + house.slice(1)} House (Demo Data)`;
+            } else if (demoEndpoint.includes('students')) {
+                currentTitle = 'Hogwarts Students (Demo Data)';
+            } else if (demoEndpoint.includes('staff')) {
+                currentTitle = 'Hogwarts Staff (Demo Data)';
+            } else {
+                currentTitle = 'All Characters (Demo Data)';
+            }
+            
+            updateUI();
+            
+            // Add notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: var(--ravenclaw-primary);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                animation: fadeIn 0.3s, fadeOut 0.3s 3.7s;
+                font-weight: 500;
+            `;
+            notification.innerHTML = '✨ Using demo data - API connection unavailable';
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 4 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+        
+        // Initialize the app with all characters
+        document.addEventListener('DOMContentLoaded', () => {
+            // Click the first button to load all characters by default
+            endpointButtons[0].click();
+        });
+        
+        // Add some animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translate(-50%, 20px); }
+                to { opacity: 1; transform: translate(-50%, 0); }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translate(-50%, 0); }
+                to { opacity: 0; transform: translate(-50%, 20px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
